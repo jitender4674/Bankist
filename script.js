@@ -22,7 +22,7 @@ const account1 = {
 const account2 = {
     owner: 'Gaurav Budhwar',
     pin: 2222,
-    movements: [20000, -2000, 800, -400, -100, -20, -20, -100],
+    movements: [20000, -200, 800, -400, -100, -20, -20, -100],
     interestRate: 1.2,
     movementsDates: [
         '2019-11-18T21:31:17.178Z',
@@ -36,7 +36,7 @@ const account2 = {
     ],
     currency: 'INR',
     locale: 'en-IN',
-}
+};
 
 const accounts = [account1, account2];
 // ///////////////////////////////////////////////////////
@@ -78,108 +78,6 @@ const inputCloseAccountPin = document.querySelector('.form__input--pin');
 
 
 
-let currentAccount;
-currentAccount = account1;
-// //////////////////////////////////////////////////////////////////////////////
-// FUNcTIONS
-// ///////////////////////////////////////////////////////////////////////////
-const formattedMovementDate = function (date, locale) {
-    const calcDayspassed = function (date1, date2) {
-        return Math.round((Math.abs(date1 - date2) / (1000 * 60 * 60 * 24)));
-    };
-
-    const daysPassed = calcDayspassed(date, new Date());
-
-    if (daysPassed === 0) return 'Today';
-    if (daysPassed === 1) return 'Yesterday';
-    if (daysPassed <= 10) return `${daysPassed} days ago`; 8
-
-
-    return new Intl.DateTimeFormat(locale).format(date);
-}
-
-const formattedCurrency = function (value, locale, currency) {
-    return new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(Math.abs(value));
-};
-
-const displayBalance = function (acc) {
-    const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-    labelBalance.textContent = formattedCurrency(balance, acc.locale, acc.currency);
-    acc.balance = Number(balance)
-};
-displayBalance(currentAccount);
-
-// displaying current date under current balance label
-const options = {
-    hour: 'numeric',
-    minute: 'numeric',
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-    second: 'numeric',
-};
-
-setInterval(function () {
-    const now = new Date();
-    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
-}, 1000);
-
-
-
-
-
-const displayMovements = function (acc) {
-    containerMovements.innerHTML = '';
-
-    const movs = acc.movements;
-
-    movs.forEach((mov, i) => {
-        const type = mov > 0 ? 'deposit' : 'withdrawal';
-
-        const date = new Date(acc.movementsDates[i]);
-        const displayDate = formattedMovementDate(date, acc.locale);
-
-        const html = `<div class="movements__row">
-                <div class="movements__type movements__type--${type}">
-                    ${i + 1} ${type}
-                </div>
-                <div class="movements__date">
-                    ${displayDate}
-                </div>
-                <div class="movements__value">
-                    ${formattedCurrency(mov, acc.locale, acc.currency)}
-                </div>
-                </div>`;
-
-        containerMovements.insertAdjacentHTML('afterbegin', html);
-    });
-};
-displayMovements(currentAccount);
-// ------------------------------------------------------------------------------------------
-
-
-const displaySummary = function (acc) {
-    const totalIn = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0);
-    labelSumIn.textContent = formattedCurrency(Math.abs(totalIn), acc.locale, acc.currency);
-
-    const totalOut = acc.movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
-    labelSumOut.textContent = formattedCurrency(Math.abs(totalOut), acc.locale, acc.currency);
-
-    const totalInterest = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + (mov * currentAccount.interestRate / 100), 0);
-    labelInterest.textContent = formattedCurrency(totalInterest, acc.locale, acc.currency)
-};
-displaySummary(currentAccount);
-
-
-// UPDATE UI FUNCTION
-const updateUi = function (acc) {
-    displayBalance(acc);
-    displayMovements(acc);
-    displaySummary(acc);
-}
-
-
-
 // creating usernames
 const createUserName = function (accArr) {
     accArr.forEach(acc => {
@@ -191,17 +89,20 @@ const createUserName = function (accArr) {
 createUserName(accounts);
 
 
-
 // ---------------------------------------------------------------------------------------------------
 
-
+let currentAccount;
+// currentAccount = account1;
 // ///////////////////////////////////////////////////////////////////////////////////////////
 // EVENT HANDLERS
 ///////////////////////////////////////////////////
 
 btnLogin.addEventListener('click', function (e) {
     e.preventDefault();
-    currentAccount = accounts.find(acc => acc.username);
+
+
+    currentAccount = accounts.find(acc => acc.username === inputLoginUser.value);
+    console.log(currentAccount);
 
     if (currentAccount?.pin === Number(inputLoginPin.value)) {
         console.log('login successful');
@@ -296,3 +197,102 @@ btnClose.addEventListener('click', function (e) {
 });
 
 
+
+
+// //////////////////////////////////////////////////////////////////////////////
+// FUNcTIONS
+// ///////////////////////////////////////////////////////////////////////////
+const formattedMovementDate = function (date, locale) {
+    const calcDayspassed = function (date1, date2) {
+        return Math.round((Math.abs(date1 - date2) / (1000 * 60 * 60 * 24)));
+    };
+
+    const daysPassed = calcDayspassed(date, new Date());
+
+    if (daysPassed === 0) return 'Today';
+    if (daysPassed === 1) return 'Yesterday';
+    if (daysPassed <= 10) return `${daysPassed} days ago`; 8
+
+
+    return new Intl.DateTimeFormat(locale).format(date);
+}
+
+const formattedCurrency = function (value, locale, currency) {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(Math.abs(value));
+};
+
+const displayBalance = function (acc) {
+    const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+    labelBalance.textContent = formattedCurrency(balance, acc.locale, acc.currency);
+    acc.balance = Number(balance)
+};
+// displayBalance(currentAccount);
+
+// displaying current date under current balance label
+const options = {
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    second: 'numeric',
+};
+
+setInterval(function () {
+    const now = new Date();
+    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
+}, 1000);
+
+
+
+
+
+const displayMovements = function (acc) {
+    containerMovements.innerHTML = '';
+
+    const movs = acc.movements;
+
+    movs.forEach((mov, i) => {
+        const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+        const date = new Date(acc.movementsDates[i]);
+        const displayDate = formattedMovementDate(date, acc.locale);
+
+        const html = `<div class="movements__row">
+                <div class="movements__type movements__type--${type}">
+                    ${i + 1} ${type}
+                </div>
+                <div class="movements__date">
+                    ${displayDate}
+                </div>
+                <div class="movements__value">
+                    ${formattedCurrency(mov, acc.locale, acc.currency)}
+                </div>
+                </div>`;
+
+        containerMovements.insertAdjacentHTML('afterbegin', html);
+    });
+};
+// displayMovements(currentAccount);
+// ------------------------------------------------------------------------------------------
+
+
+const displaySummary = function (acc) {
+    const totalIn = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0);
+    labelSumIn.textContent = formattedCurrency(Math.abs(totalIn), acc.locale, acc.currency);
+
+    const totalOut = acc.movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
+    labelSumOut.textContent = formattedCurrency(Math.abs(totalOut), acc.locale, acc.currency);
+
+    const totalInterest = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + (mov * currentAccount.interestRate / 100), 0);
+    labelInterest.textContent = formattedCurrency(totalInterest, acc.locale, acc.currency)
+};
+// displaySummary(currentAccount);
+
+
+// UPDATE UI FUNCTION
+const updateUi = function (acc) {
+    displayBalance(acc);
+    displayMovements(acc);
+    displaySummary(acc);
+}
