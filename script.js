@@ -3,7 +3,7 @@
 const account1 = {
     owner: 'Jitender Budhwar',
     pin: 1111,
-    movements: [1000, -200, 800, -400, -20, -20, -20, -100],
+    movements: [10000, -200, 800, -400, -20, -20, -20, -100],
     interestRate: 1.2,
     movementsDates: [
         '2019-11-18T21:31:17.178Z',
